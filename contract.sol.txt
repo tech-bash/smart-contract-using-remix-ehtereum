@@ -1,0 +1,50 @@
+pragma solidity ^0.5.9;
+
+contract will{
+
+    address owner ;
+    uint fortune;
+    bool deceased;
+
+
+  constructor() payable public {
+      owner = msg.sender;
+      fortune=msg.value;
+      deceased = false;
+
+  }
+  modifier onlyowner{
+      require(msg.sender == owner );
+      _;
+      
+  }
+  modifier is_deceased{
+      require (deceased == true);
+      _;
+  }
+
+  address payable[] familywallet;
+
+//   map through inheritance 
+  
+mapping( address => uint ) inheritance;
+ 
+ function setinheritance ( address payable  wallet, uint amount ) public onlyowner {
+     familywallet.push(wallet);
+     inheritance[wallet]=amount;
+ }
+  function payout() private is_deceased{
+      for(uint i=0;i<familywallet.length;i++){
+          familywallet[i].transfer(inheritance[familywallet[i]]);
+      }
+
+  }
+   // oracle switch simulator
+    function dead() payable onlyowner {
+        deceased = true;
+        payout();
+    }
+
+}
+
+
